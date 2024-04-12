@@ -1,0 +1,68 @@
+Spark组件:
+Spark Core：Spark 的核心模块，包含 RDD、任务调度、内存管理、错误恢复、与存储系统交互等功能。
+Spark SQL：主要用于进行结构化数据的处理。它提供的最核心的编程抽象就是 DataFrame，将其作为分布式 SQL 查询引擎，通过将 Spark SQL 转化为 RDD 来执行各种操作。
+Spark Streaming：Spark 提供的对实时数据进行流式计算的组件。提供了用来操作数据流的 API。
+Structured Streaming：处理结构化流,统一了离线和实时的 API。
+
+Spark 架构主采用 Master/Worker 主从架构进行设计，由以下几部分组成：
+主节点 Master / 资源管理 Yarn Application Master
+工作节点 Work / Node Manager
+任务调度器 Driver
+任务执行器 Executor
+
+Spark 的提交方式有哪些？
+Local 本地模式(单机)。分为 Local 单线程和 Local-Cluster 多线程。
+Standalone 独立集群模式。包含 Standalone 模式和 Standalone-HA 高可用模式。Standalone-HA 使用 Zookeeper 搭建高可用，避免单点故障问题。
+Spark On Yarn 集群模式。运行在 Yarn 集群之上，由 Yarn 负责资源管理，Spark 负责任务调度和计算。
+Spark on YARN 模式根据 Driver 在集群中的位置分为两种模式：一种是 YARN-Client 模式，另一种是 YARN-Cluster (或称为 YARN-Standalone 模式)。
+好处：计算资源按需伸缩，集群利用率高，共享底层存储，避免数据跨集群迁移。
+
+Spark 为什么比 MapReduce 快？
+Spark 是基于内存计算，MapReduce 是基于磁盘运算，所以速度快
+Spark 拥有高效的调度算法，是基于 DAG,形成一系列的有向无环图
+Spark 是通过 RDD 算子来运算的，它拥有两种操作，一种转换操作，一种动作操作，可以将先运算的结果存储在内存中，随后在计算出来
+Spark 还拥有容错机制 Linage。
+
+你知道 map 和 mapPartitions 有啥区别吗？
+map：每次对 RDD 中的每一个元素进行操作；
+mapPartitions：每次对 RDD 中的每一个分区的迭代器进行操作；
+mapPartitions 优点：
+如果是普通的 map，比如一个 Partition 中有 1 万条数据。ok，那么你的 Function 要执行和计算 1 万次。
+对于 mapPartitions 来说，一个 task 仅仅会执行一次 function，function 一次接收所有的 Partition 数据。只要执行一次就可以了，性能比较高。
+如果在 map 过程中需要频繁创建额外的对象(例如将 rdd 中的数据通过 jdbc 写入数据库,map 需要为每个元素创建一个链接而 mapPartitions 为每个 partition 创建一个链接),则 mapPartitions 效率比 Map 高的多。
+SparkSql 或 DataFrame 默认会对程序进行 mapPartitions 的优化。
+mapPartitions 的缺点：
+会造成内存溢出。
+举例，对于 100 万数据，一次传入一个 function 以后，可能一下子内存不够，但是又没有办法腾出内存空间来，可能就OOM，内存溢出。
+
+你知道 reduceByKey 和 groupByKey 有啥区别吗？
+reduceByKey()会在 shuffle 之前对数据进行合并。有点类似于在 MapReduce 中的 combiner。这样做的好处在于，在转换操作时就已经对数据进行了一次聚合操作，从而减小数据传输。如下图所示：
+groupByKey 算子操作发生在动作操作端，即 Shuffle 之后，所以势必会将所有的数据通过网络进行传输，造成不必要的浪费。同时如果数据量十分大，可能还会造成 OutOfMemoryError。如下图所示：
+
+RDD 有哪些缺点？
+不支持细粒度的写和更新操作（如网络爬虫）， spark 写数据是粗粒度的
+所谓粗粒度，就是批量写入数据，为了提高效率。但是读数据是细粒度的也就是 说可以一条条的读。
+不支持增量迭代计算， Flink支持。
+
+RDD 五大属性
+分组，标记数据是哪个分区
+计算每个分区的函数
+依赖关系
+分片函数 控制分区的数据流向
+列表 存储每个Partition的优先位置 移动数据不如移动计算
+
+Spark为什么不适用kryo作为默认
+① Java 序列化：默认情况下，Spark 使用 Java 的对象输出流框架(ObjectOutputStream framework)来进行对象的序列化，并且可用在任意实现 Java.io.Serializable 接口的自定义类上。我们可以通过扩展 Java.io.Externalizable 来更加精细地控制序列化行为。Java 序列化方式非常灵活，但是通常序列化速度非常慢而且对于很多类会产生非常巨大的序列化结果。
+② Kryo 序列化：Spark 在2.0.0以上的版本可以使用 Kryo 库来非常快速地进行对象序列化，Kryo 要比 Java 序列化更快、更紧凑(10倍)，但是其不支持所有的 Serializable 类型，并且在使用自定义类之前必须先注册。
+
+Spark优化：
+1）RDD内存优化： 内存充足 cache memory_only 内存不足：存储等级设为memory_only_ser 配置kryo使用序列化缓存
+2）小文件过多：spark当中一个分区最终落盘形成一个文件 分区缩小即可 coalesce算子指定缩小后的分区个数 实际处理插入数据的任务只有一个，可能会导致oom
+3）合理利用cpu资源：一般会将分区（也就是task）设置成vcore的2倍到3倍
+4）针对小表join大表：使用广播join
+5）数据倾斜：1.	打散大表：实际就是数据一进一出进行处理，对courseid前拼上随机前缀实现打散
+           2.	扩容小表：实际就是将DataFrame中每一条数据，转成一个集合，并往这个集合里循环添加10条数据，最后使用flatmap压平此集合，达到扩容的效果.
+6）SMB Join：Spark对表进行分桶
+7）申请使用堆外缓存：测试申请容器上限，使用堆外缓存级别 减少GC
+8）
+

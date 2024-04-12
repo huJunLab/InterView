@@ -1,0 +1,6 @@
+AOP通知
+before（前置通知） 	        @Before     	通知方法在目标方法调用之前执行
+after（后置通知）	            @After	        通知方法在目标方法返回或异常后调用
+after-returning（返回通知）	@AfterReturning	通知方法会在目标方法返回后调用
+after-throwing（异常通知）	@AfterThrowing	通知方法会在目标方法抛出异常后调用
+around（环绕通知）	        @Around	        通知方法会将目标方法封装起来
