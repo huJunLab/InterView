@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bb37123d-e0fe-4810-8eb9-f75e156de82f" name="Changes" comment="1">
+      <change afterPath="$PROJECT_DIR$/实时.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/离线.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MySQL.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MySQL.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spring.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Spring.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,9 +21,9 @@
   <component name="GitToolBoxStore">
     <option name="projectConfigVersion" value="5" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2eyrql4JsvkJRFTYmsnX6CKyzS2" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -42,6 +44,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -61,6 +64,7 @@
       <option name="presentableId" value="Default" />
       <updated>1712887856104</updated>
       <workItem from="1712887857181" duration="5046000" />
+      <workItem from="1712932391035" duration="2116000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <option name="closed" value="true" />
